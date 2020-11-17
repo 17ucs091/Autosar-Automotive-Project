@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: android.car">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/AppData/Local/Android/Sdk/platforms/android-29/optional/android.car.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
