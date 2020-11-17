@@ -6,32 +6,34 @@
     app:startDestination="@+id/navigation_home">
 
     <fragment
+        android:id="@+id/navigation_calendar"
+        android:name="com.pradeesh.knowcovid.ui.calendar.CalendarFragment"
+        android:label="Calendar Management"
+        tools:layout="@layout/fragment_cal" />
+
+    <fragment
         android:id="@+id/navigation_home"
         android:name="com.pradeesh.knowcovid.ui.home.HomeFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home" />
 
-    <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="com.pradeesh.knowcovid.ui.country.CountryFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+    <!--    <fragment-->
+    <!--        android:id="@+id/navigation_dashboard"-->
+    <!--        android:name="com.pradeesh.knowcovid.ui.country.CountryFragment"-->
+    <!--        android:label="@string/title_dashboard"-->
+    <!--        tools:layout="@layout/fragment_dashboard" />-->
 
-    <fragment
-        android:id="@+id/navigation_map"
-        android:name="com.pradeesh.knowcovid.ui.map.MapFragment"
-        android:label="@string/bottom_menu_map"
-        tools:layout="@layout/fragment_map" />
+    <!--    <fragment-->
+    <!--        android:id="@+id/navigation_map"-->
+    <!--        android:name="com.pradeesh.knowcovid.ui.map.MapFragment"-->
+    <!--        android:label="@string/bottom_menu_map"-->
+    <!--        tools:layout="@layout/fragment_map" />-->
 
-    <fragment
-        android:id="@+id/rss_feed"
-        android:name="com.pradeesh.knowcovid.ui.news.RSSFeedFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_rss" />
+    <!--    <fragment-->
+    <!--        android:id="@+id/rss_feed"-->
+    <!--        android:name="com.pradeesh.knowcovid.ui.news.RSSFeedFragment"-->
+    <!--        android:label="@string/title_notifications"-->
+    <!--        tools:layout="@layout/fragment_rss" />-->
 
-    <fragment
-        android:id="@+id/navigation_calendar"
-        android:name="com.pradeesh.knowcovid.ui.calendar.CalendarFragment"
-        android:label="Calendar Management"
-        tools:layout="@layout/fragment_cal" />
+
 </navigation>

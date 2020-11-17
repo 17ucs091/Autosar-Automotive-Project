@@ -43,8 +43,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         BottomNavigationView navView = findViewById(R.id.nav_view);
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_dashboard,
-                R.id.navigation_map, R.id.rss_feed , R.id.navigation_calendar)
+                R.id.navigation_home,
+//                R.id.navigation_dashboard,
+//                R.id.navigation_map, R.id.rss_feed ,
+                R.id.navigation_calendar)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupWithNavController(navView, navController);

@@ -137,4 +137,8 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
             }
         }
 
+
+        public void detectHotwords(ArrayList<String> data){
+
+        }
     }
