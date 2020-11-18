@@ -13,6 +13,7 @@ import android.provider.CalendarContract;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.speech.tts.TextToSpeech;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,13 +30,17 @@ import androidx.fragment.app.Fragment;
 import com.pradeesh.knowcovid.R;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
     public class CalendarFragment extends Fragment {
         public static final Integer RecordAudioRequestCode = 1;
         private SpeechRecognizer speechRecognizer;
+        private TextToSpeech textToSpeech;
         private TextView editText;
         private Button micButton,showEvents;
         Cursor cursor;
@@ -58,6 +63,17 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
             micButton = root.findViewById(R.id.voice_button);
 
             showEvents = root.findViewById(R.id.show_events);
+
+            textToSpeech = new TextToSpeech(getContext().getApplicationContext(), new TextToSpeech.OnInitListener() {
+                @Override
+                public void onInit(int i) {
+                    if(i == TextToSpeech.SUCCESS){
+                        // select language
+                        int lang = textToSpeech.setLanguage(Locale.ENGLISH);
+                    }
+                }
+            });
+
             speechRecognizer = SpeechRecognizer.createSpeechRecognizer(root.getContext());
 
             final Intent speechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -192,6 +208,15 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
 
 
         public void detectHotwords(ArrayList<String> data){
+            HashMap<String,String> commands = new HashMap();
+            commands.put("schedule an event for today", "adding an event");
+            commands.put("show me the events for today", "showing today's events");
 
+            for(String command: commands.keySet()){
+                if (command.contains(data.get(0))){
+                    // speak the response
+                    int speech = textToSpeech.speak(commands.get(command),TextToSpeech.QUEUE_FLUSH,null );
+                }
+            }
         }
     }
