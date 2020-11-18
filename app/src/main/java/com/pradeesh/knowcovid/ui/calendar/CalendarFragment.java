@@ -1,10 +1,15 @@
 package com.pradeesh.knowcovid.ui.calendar;
 
 import android.Manifest;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -24,6 +29,7 @@ import androidx.fragment.app.Fragment;
 import com.pradeesh.knowcovid.R;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Locale;
 
 import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
@@ -31,8 +37,8 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
         public static final Integer RecordAudioRequestCode = 1;
         private SpeechRecognizer speechRecognizer;
         private TextView editText;
-        private Button micButton;
-
+        private Button micButton,showEvents;
+        Cursor cursor;
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater,
                                  ViewGroup container, Bundle savedInstanceState) {
@@ -48,6 +54,8 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
 
             editText = root.findViewById(R.id.text);
             micButton = root.findViewById(R.id.voice_button);
+
+            showEvents = root.findViewById(R.id.show_events);
             speechRecognizer = SpeechRecognizer.createSpeechRecognizer(root.getContext());
 
             final Intent speechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -91,6 +99,19 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
 //                    micButton.setImageResource(R.drawable.ic_mic_black_off);
                     ArrayList<String> data = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
                     editText.setText(data.get(0));
+
+                    ContentResolver cr= getActivity().getContentResolver();
+                    ContentValues cv= new ContentValues();
+                    cv.put(CalendarContract.Events.TITLE,"Event for Car Service");
+                    cv.put(CalendarContract.Events.DTSTART, Calendar.getInstance().getTimeInMillis());
+                    cv.put(CalendarContract.Events.DTSTART, Calendar.getInstance().getTimeInMillis()+60*1000);
+                    cv.put(CalendarContract.Events.CALENDAR_ID,10);
+                    cv.put(CalendarContract.Events.EVENT_TIMEZONE,Calendar.getInstance().getTimeZone().getID());
+
+                    Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI,cv);
+
+                    Toast.makeText(getContext(), "Event is successfully added", Toast.LENGTH_SHORT).show();
+
                 }
 
                 @Override
@@ -103,6 +124,36 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
 
                 }
             });
+
+            showEvents.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+                        return;
+                    }
+                    cursor = getActivity().getContentResolver().query(CalendarContract.Events.CONTENT_URI, null, null, null);
+                    while (cursor.moveToNext()) {
+                        if (cursor != null) {
+                            int val1 = cursor.getColumnIndex(CalendarContract.Events._ID);
+                            int val2 = cursor.getColumnIndex(CalendarContract.Events.TITLE);
+                            int val3 = cursor.getColumnIndex(CalendarContract.Events.DTSTART);
+                            int val4 = cursor.getColumnIndex(CalendarContract.Events.DTEND);
+
+                            String ID_val = cursor.getColumnName(val1);
+                            String title_val = cursor.getColumnName(val2);
+                            String sTime_val = cursor.getColumnName(val3);
+                            String eTime = cursor.getColumnName(val4);
+
+                            Toast.makeText(getContext(), ID_val + " " + title_val + " " + sTime_val + " " + eTime, Toast.LENGTH_LONG).show();
+
+                        } else {
+                            Toast.makeText(getContext(), "Event is not Present", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+            });
+
+
 
             micButton.setOnClickListener(new View.OnClickListener() {
                 @Override
