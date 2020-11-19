@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private Car car;
     private final String[] permissions = new String[]{"android.car.permission.CAR_SPEED", "permission:android.car.permission.CAR_POWERTRAIN"};
 
+
     private VehicleEventMessage vehicleEventMessage;
     @Override
     protected void onCreate(Bundle savedInstanceState) {

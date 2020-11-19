@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -36,6 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import static android.app.Activity.RESULT_OK;
 import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
     public class CalendarFragment extends Fragment {
         public static final Integer RecordAudioRequestCode = 1;
@@ -45,20 +47,17 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
         private Button micButton,showEvents;
         Cursor cursor;
         private int id=3;
-
+        private static final int REQUEST_CODE_SPEECH_INPUT=100;
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater,
                                  ViewGroup container, Bundle savedInstanceState) {
 
             View root = inflater.inflate(R.layout.fragment_cal, container, false);
-
             setUI(root);
-
 
             if (ContextCompat.checkSelfPermission(root.getContext(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
                 checkPermission();
             }
-
             editText = root.findViewById(R.id.text);
             micButton = root.findViewById(R.id.voice_button);
 
@@ -74,112 +73,44 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
                 }
             });
 
-            speechRecognizer = SpeechRecognizer.createSpeechRecognizer(root.getContext());
-
-            final Intent speechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-            speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-            speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-
-            speechRecognizer.setRecognitionListener(new RecognitionListener() {
-                @Override
-                public void onReadyForSpeech(Bundle bundle) {
-
-                }
-
-                @Override
-                public void onBeginningOfSpeech() {
-                    editText.setText("");
-                    editText.setHint("Listening...");
-                }
-
-                @Override
-                public void onRmsChanged(float v) {
-
-                }
-
-                @Override
-                public void onBufferReceived(byte[] bytes) {
-
-                }
-
-                @Override
-                public void onEndOfSpeech() {
-
-                }
-
-                @Override
-                public void onError(int i) {
-
-                }
-
-                @Override
-                public void onResults(Bundle bundle) {
-//                    micButton.setImageResource(R.drawable.ic_mic_black_off);
-                    ArrayList<String> data = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-                    editText.setText(data.get(0));
-//                    Toast.makeText(getContext(), "Event is successfully added", Toast.LENGTH_SHORT).show();
-                    ContentResolver cr= getActivity().getContentResolver();
-                    ContentValues cv= new ContentValues();
-                    cv.put(CalendarContract.Events.TITLE,"Event for Car Service");
-                    cv.put(CalendarContract.Events.DTSTART, Calendar.getInstance().getTimeInMillis());
-                    cv.put(CalendarContract.Events.DTSTART, Calendar.getInstance().getTimeInMillis()+60*1000);
-                    cv.put(CalendarContract.Events.CALENDAR_ID,++id);
-                    cv.put(CalendarContract.Events.EVENT_TIMEZONE,Calendar.getInstance().getTimeZone().getID());
-
-                    Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI,cv);
-
-                    Toast.makeText(getContext(), "Event is successfully added", Toast.LENGTH_SHORT).show();
-
-                }
-
-                @Override
-                public void onPartialResults(Bundle bundle) {
-
-                }
-
-                @Override
-                public void onEvent(int i, Bundle bundle) {
-
-                }
-            });
-
-            showEvents.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
-                        return;
-                    }
-//                    cursor = getActivity().getContentResolver().query(CalendarContract.Events.CONTENT_URI, null, null, null);
-//                    while (cursor.moveToNext()) {
-//                        if (cursor != null) {
-//                            int val1 = cursor.getColumnIndex(CalendarContract.Events._ID);
-//                            int val2 = cursor.getColumnIndex(CalendarContract.Events.TITLE);
-//                            int val3 = cursor.getColumnIndex(CalendarContract.Events.DTSTART);
-//                            int val4 = cursor.getColumnIndex(CalendarContract.Events.DTEND);
-//
-//                            String ID_val = cursor.getColumnName(val1);
-//                            String title_val = cursor.getColumnName(val2);
-//                            String sTime_val = cursor.getColumnName(val3);
-//                            String eTime = cursor.getColumnName(val4);
-//
-//                            Toast.makeText(getContext(), ID_val + " " + title_val + " " + sTime_val + " " + eTime, Toast.LENGTH_LONG).show();
-//
-//                        } else {
-//                            Toast.makeText(getContext(), "Event is not Present", Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-                }
-            });
-
-
 
             micButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    speechRecognizer.startListening(speechRecognizerIntent);
+                    speak();
                 }
             });
             return root;
+        }
+
+        private void speak(){
+            Intent intent= new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            intent .putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT , "Give Event Description");
+
+            try{
+                startActivityForResult(intent, REQUEST_CODE_SPEECH_INPUT);
+            }
+            catch(Exception e){
+                Toast.makeText(getContext()," "+ e.getMessage() , Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+            super.onActivityResult(requestCode, resultCode, data);
+
+            switch(requestCode){
+                case REQUEST_CODE_SPEECH_INPUT:{
+                    if(resultCode== RESULT_OK && null!=data){
+                        ArrayList<String> result =data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                        editText.setText(result.get(0));
+                        detectHotwords(result);
+                    }
+                    break;
+                }
+            }
         }
 
         private void setUI(View root) {
@@ -209,8 +140,9 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
 
         public void detectHotwords(ArrayList<String> data){
             HashMap<String,String> commands = new HashMap();
-            commands.put("schedule an event for today", "adding an event");
-            commands.put("show me the events for today", "showing today's events");
+            commands.put("schedule", "adding an event");
+            commands.put("show", "showing today's events");
+            commands.put("read", "Reading today's events");
 
             for(String command: commands.keySet()){
                 if (command.contains(data.get(0))){
