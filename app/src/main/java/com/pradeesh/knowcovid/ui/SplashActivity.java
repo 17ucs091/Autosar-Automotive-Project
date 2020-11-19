@@ -23,8 +23,6 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        textView_appTitle = findViewById(R.id.titleText);
-        textView_appTitle.setText(Html.fromHtml(SPLASH_APPNAME, 0));
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
