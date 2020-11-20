@@ -9,9 +9,9 @@
         android:icon="@drawable/calendar"/>
 
 
-    <item
-        android:id="@+id/navigation_home"
-        android:icon="@drawable/ic_world_black_24dp"/>
+<!--    <item-->
+<!--        android:id="@+id/navigation_home"-->
+<!--        android:icon="@drawable/ic_world_black_24dp"/>-->
 
 <!--    <item-->
 <!--        android:id="@+id/navigation_dashboard"-->
