@@ -14,6 +14,7 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -47,6 +48,7 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
         private Button micButton,showEvents;
         Cursor cursor;
         private int id=3;
+        private String sttResult = null;
         private static final int REQUEST_CODE_SPEECH_INPUT=100;
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater,
@@ -78,6 +80,10 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
                 @Override
                 public void onClick(View view) {
                     speak();
+                    if(sttResult != null) {
+                        editText.setText(sttResult);
+                        detectHotwords(sttResult);
+                    }
                 }
             });
             return root;
@@ -104,9 +110,10 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
             switch(requestCode){
                 case REQUEST_CODE_SPEECH_INPUT:{
                     if(resultCode== RESULT_OK && null!=data){
-                        ArrayList<String> result =data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                        editText.setText(result.get(0));
-                        detectHotwords(result);
+                        ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+//                        editText.setText(result.get(0));
+//                        detectHotwords(result.get(0));
+                        sttResult = result.get(0);
                     }
                     break;
                 }
@@ -138,16 +145,26 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
         }
 
 
-        public void detectHotwords(ArrayList<String> data){
-            HashMap<String,String> commands = new HashMap();
-            commands.put("schedule", "adding an event");
-            commands.put("show", "showing today's events");
-            commands.put("read", "Reading today's events");
+        public void detectHotwords(String command){
+            HashMap<String, Runnable> hotwords = new HashMap();
+//            hotwords.put("schedule", "adding an event");
+//            hotwords.put("show", "showing today's events");
+//            hotwords.put("read", "Reading today's events");
+//
+//            for(String hotword: hotwords.keySet()){
+//                if (command.toLowerCase().contains(hotword)){
+//                    // speak the response
+//                    int speech = textToSpeech.speak(hotwords.get(hotword),TextToSpeech.QUEUE_FLUSH,null );
+//                }
+//            }
 
-            for(String command: commands.keySet()){
-                if (command.contains(data.get(0))){
-                    // speak the response
-                    int speech = textToSpeech.speak(commands.get(command),TextToSpeech.QUEUE_FLUSH,null );
+            hotwords.put("schedule", () -> {
+                int speech = textToSpeech.speak("adding an event. Please give a description for the event",TextToSpeech.QUEUE_FLUSH,null );
+            });
+
+            for(String hotword: hotwords.keySet()){
+                if (command.toLowerCase().contains(hotword)){
+                    hotwords.get(hotword).run();
                 }
             }
         }
