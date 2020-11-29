@@ -49,6 +49,7 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
         private Button micButton,showEvents;
         Cursor cursor;
         private int id=3;
+        private String sttResult = null;
         private static final int REQUEST_CODE_SPEECH_INPUT=100;
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater,
@@ -74,7 +75,6 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
                     }
                 }
             });
-
 
 
 
@@ -110,17 +110,25 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
 
                     }
                     Log.d("dsd","DownLog");
-                    }
+                }
             });
 
+
+
             micButton.setOnClickListener(new View.OnClickListener() {
-                @Override
+                @Override   
                 public void onClick(View view) {
                     speak();
+                    if(sttResult != null) {
+                        editText.setText(sttResult);
+                        detectHotwords(sttResult);
+                    }
                 }
             });
             return root;
         }
+
+
 
         private void speak(){
             Intent intent= new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -143,22 +151,8 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
             switch(requestCode){
                 case REQUEST_CODE_SPEECH_INPUT:{
                     if(resultCode== RESULT_OK && null!=data){
-                        ArrayList<String> result =data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                        editText.setText(result.get(0));
-
-                    ContentResolver cr= getActivity().getContentResolver();
-                    ContentValues cv= new ContentValues();
-                    cv.put(CalendarContract.Events.TITLE,"Event for Car Service");
-                    cv.put(CalendarContract.Events.DTSTART, Calendar.getInstance().getTimeInMillis());
-                    cv.put(CalendarContract.Events.DTEND, Calendar.getInstance().getTimeInMillis()+60*1000);
-                    cv.put(CalendarContract.Events.CALENDAR_ID,90);
-                    cv.put(CalendarContract.Events.EVENT_TIMEZONE,Calendar.getInstance().getTimeZone().getID());
-
-                    Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI,cv);
-
-                    Toast.makeText(getContext(), "Event is successfully added", Toast.LENGTH_SHORT).show();
-                        detectHotwords(result);
-
+                        ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                        sttResult = result.get(0);
                     }
                     break;
                 }
@@ -190,16 +184,44 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
         }
 
 
-        public void detectHotwords(ArrayList<String> data){
-            HashMap<String,String> commands = new HashMap();
-            commands.put("schedule", "adding an event");
-            commands.put("show", "showing today's events");
-            commands.put("read", "Reading today's events");
+        public void detectHotwords(String command){
+            HashMap<String, Runnable> hotwords = new HashMap();
+//            hotwords.put("schedule", "adding an event");
+//            hotwords.put("show", "showing today's events");
+//            hotwords.put("read", "Reading today's events");
+//
+//            for(String hotword: hotwords.keySet()){
+//                if (command.toLowerCase().contains(hotword)){
+//                    // speak the response
+//                    int speech = textToSpeech.speak(hotwords.get(hotword),TextToSpeech.QUEUE_FLUSH,null );
+//                }
+//            }
 
-            for(String command: commands.keySet()){
-                if (command.contains(data.get(0))){
-                    // speak the response
-                    int speech = textToSpeech.speak(commands.get(command),TextToSpeech.QUEUE_FLUSH,null );
+            hotwords.put("schedule", () -> {
+                int speech = textToSpeech.speak("adding an event. Please give a description for the event",TextToSpeech.QUEUE_FLUSH,null );
+
+
+
+
+
+
+                ContentResolver cr= getActivity().getContentResolver();
+                ContentValues cv= new ContentValues();
+                cv.put(CalendarContract.Events.TITLE,"Event for Car Service");
+                cv.put(CalendarContract.Events.DTSTART, Calendar.getInstance().getTimeInMillis()+30*1000);
+                cv.put(CalendarContract.Events.DTEND, Calendar.getInstance().getTimeInMillis()+60*60*1000);
+                cv.put(CalendarContract.Events.CALENDAR_ID,90);
+                cv.put(CalendarContract.Events.EVENT_TIMEZONE,Calendar.getInstance().getTimeZone().getID());
+
+                Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI,cv);
+
+                Toast.makeText(getContext(), "Event is successfully added", Toast.LENGTH_SHORT).show();
+
+            });
+
+            for(String hotword: hotwords.keySet()){
+                if (command.toLowerCase().contains(hotword)){
+                    hotwords.get(hotword).run();
                 }
             }
         }
