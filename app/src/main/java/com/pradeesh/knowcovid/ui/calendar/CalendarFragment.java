@@ -14,6 +14,7 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -36,6 +37,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import static android.app.Activity.RESULT_OK;
 import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
@@ -74,6 +76,43 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
             });
 
 
+
+
+            showEvents.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (ActivityCompat.checkSelfPermission(Objects.requireNonNull(getContext()), Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+                        return;
+                    }
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        cursor = getActivity().getContentResolver().query(CalendarContract.Events.CONTENT_URI, null, null, null);
+                    }
+
+                    while (cursor.moveToNext()) {
+                        if (cursor != null) {
+                            Log.i("dsd","DownLog");
+                            int val1 = cursor.getColumnIndex(CalendarContract.Events._ID);
+                            int val2 = cursor.getColumnIndex(CalendarContract.Events.TITLE);
+                            int val3 = cursor.getColumnIndex(CalendarContract.Events.DTSTART);
+                            int val4 = cursor.getColumnIndex(CalendarContract.Events.DTEND);
+
+                            String ID_val = cursor.getColumnName(val1);
+                            String title_val = cursor.getColumnName(val2);
+                            String sTime_val = cursor.getColumnName(val3);
+                            String eTime = cursor.getColumnName(val4);
+
+                            Toast.makeText(getContext(), ID_val + " " + title_val + " " + sTime_val + " " + eTime, Toast.LENGTH_LONG).show();
+
+                        } else {
+                            Toast.makeText(getContext(), "Event is not Present", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+                    Log.d("dsd","DownLog");
+                    }
+            });
+
             micButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -106,7 +145,20 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
                     if(resultCode== RESULT_OK && null!=data){
                         ArrayList<String> result =data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                         editText.setText(result.get(0));
+
+                    ContentResolver cr= getActivity().getContentResolver();
+                    ContentValues cv= new ContentValues();
+                    cv.put(CalendarContract.Events.TITLE,"Event for Car Service");
+                    cv.put(CalendarContract.Events.DTSTART, Calendar.getInstance().getTimeInMillis());
+                    cv.put(CalendarContract.Events.DTEND, Calendar.getInstance().getTimeInMillis()+60*1000);
+                    cv.put(CalendarContract.Events.CALENDAR_ID,90);
+                    cv.put(CalendarContract.Events.EVENT_TIMEZONE,Calendar.getInstance().getTimeZone().getID());
+
+                    Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI,cv);
+
+                    Toast.makeText(getContext(), "Event is successfully added", Toast.LENGTH_SHORT).show();
                         detectHotwords(result);
+
                     }
                     break;
                 }

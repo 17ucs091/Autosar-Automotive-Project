@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">kNOw Corona</string>
+    <string name="app_name">Event Management</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
@@ -31,10 +31,10 @@
     <string name="recovered">Recovered</string>
     <string name="deceased">Deceased</string>
 
-    <string name="splash_title">kNOw Corona</string>
+    <string name="splash_title">Event Management</string>
     <string name="rss_headline_title">RSS headline ...</string>
 
-    <string name="brought_you_by"> - Pradeesh</string>
+    <string name="brought_you_by"> - Mohit And Subhajit</string>
 
 
 </resources>
