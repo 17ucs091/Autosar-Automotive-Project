@@ -27,10 +27,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.pradeesh.knowcovid.R;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -77,13 +79,12 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
             });
 
 
-
             showEvents.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (ActivityCompat.checkSelfPermission(Objects.requireNonNull(getContext()), Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
-                        return;
-                    }
+//                    if (ActivityCompat.checkSelfPermission(Objects.requireNonNull(getContext()), Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+//                        return;
+//                    }
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         cursor = getActivity().getContentResolver().query(CalendarContract.Events.CONTENT_URI, null, null, null);
@@ -116,13 +117,13 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
 
 
             micButton.setOnClickListener(new View.OnClickListener() {
-                @Override   
+                @Override
                 public void onClick(View view) {
                     speak();
-                    if(sttResult != null) {
-                        editText.setText(sttResult);
-                        detectHotwords(sttResult);
-                    }
+//                    if(sttResult != null) {
+//                        editText.setText(sttResult);
+//                        detectHotwords(sttResult);
+//                    }
                 }
             });
             return root;
@@ -153,6 +154,7 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
                     if(resultCode== RESULT_OK && null!=data){
                         ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                         sttResult = result.get(0);
+                        detectHotwords(sttResult);
                     }
                     break;
                 }
@@ -199,12 +201,13 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
 
             hotwords.put("schedule", () -> {
                 int speech = textToSpeech.speak("adding an event. Please give a description for the event",TextToSpeech.QUEUE_FLUSH,null );
+                editText.setText(sttResult);
+                //Calling Event Description Fragment
+                EventDescDialog dialogFragment=new EventDescDialog();
+                dialogFragment.show(getActivity().getSupportFragmentManager(),"dialog box");
 
 
-
-
-
-
+                // Making an event
                 ContentResolver cr= getActivity().getContentResolver();
                 ContentValues cv= new ContentValues();
                 cv.put(CalendarContract.Events.TITLE,"Event for Car Service");
