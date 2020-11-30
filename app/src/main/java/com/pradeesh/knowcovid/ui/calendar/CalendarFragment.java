@@ -91,15 +91,16 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         Log.d("uri","Inside BuilVersion");
-                         cursor = getActivity().getContentResolver()
-                                .query(
-                                        Uri.parse("content://com.android.calendar/events"),
-                                        new String[] { "calendar_id", "title", "description",
-                                                "dtstart", "dtend", "eventLocation" }, null,
-                                        null, null);
-//                        cursor = getActivity().getContentResolver().query(CalendarContract.Events.CONTENT_URI, null, null, null);
 
-                        Log.d("uri",cursor.toString());
+//                         cursor = getActivity().getContentResolver()
+//                                .query(
+//                                        Uri.parse("content://com.android.calendar/events"),
+//                                        new String[] { "calendar_id", "title", "description",
+//                                                "dtstart", "dtend", "eventLocation" }, null,
+//                                        null, null);
+                        cursor = getActivity().getContentResolver().query(CalendarContract.Events.CONTENT_URI, null, null, null);
+
+                        Log.d("uri",CalendarContract.Events.CONTENT_URI.toString());
                     }
                     if(cursor.moveToFirst())
                         Log.d("uri","cursor is not empty");
@@ -107,8 +108,9 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
                         Log.d("uri","is empty");
 
                     while (cursor.moveToNext()) {
+                        Log.d("dsd","DownLog");
                         if (cursor != null) {
-                            Log.i("dsd","DownLog");
+
                             int val1 = cursor.getColumnIndex(CalendarContract.Events._ID);
                             int val2 = cursor.getColumnIndex(CalendarContract.Events.TITLE);
                             int val3 = cursor.getColumnIndex(CalendarContract.Events.DTSTART);
@@ -124,25 +126,20 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
                         } else {
                             Toast.makeText(getContext(), "Event is not Present", Toast.LENGTH_SHORT).show();
                         }
-
                     }
                     Log.d("dsd","DownLog");
                 }
             });
-
-
 
             micButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     purpose="detectHotwords";
                     getSpeechFromUser();
-
                 }
             });
             return root;
         }
-
 
 
         private void getSpeechFromUser(){
