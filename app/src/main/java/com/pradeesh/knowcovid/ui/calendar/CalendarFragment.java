@@ -175,6 +175,24 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
                             }
                             case "getDescription":{
                                 dialogFragment.description.setText(result);
+                                initiateConversation("Do you want to add any participants for the event?", "askForParticipants", 3000);
+                                break;
+                            }
+                            case "askForParticipants":{
+                                if(result.toLowerCase().contains("yes") || result.toLowerCase().contains("yeah")){
+                                    initiateConversation("Please speak the participant name", "getParticipants", 3000);
+                                } else {
+                                    speak("Okay, Finished.");
+                                }
+
+                                break;
+                            }
+                            case "getParticipants":{
+                                String previousParticipants = dialogFragment.participants.getText().toString();
+                                dialogFragment.participants.setText(((previousParticipants == "")?previousParticipants:(previousParticipants + ", ")) + result);
+
+                                initiateConversation("Do you want to add more participants ?", "askForParticipants", 3000);
+
                                 break;
                             }
                         }
@@ -213,38 +231,32 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
 
         }
 
+        public void initiateConversation(String textToSpeak, String latestPurpose, int delay){
+            speak(textToSpeak);
+            purpose = latestPurpose;
+            final Handler handler = new Handler(Looper.getMainLooper());
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    getSpeechFromUser();
+                }
+            }, delay);
+        }
 
         public void detectHotwords(String command){
             HashMap<String, Runnable> hotwords = new HashMap();
 //            hotwords.put("schedule", "adding an event");
 //            hotwords.put("show", "showing today's events");
 //            hotwords.put("read", "Reading today's events");
-//
-//            for(String hotword: hotwords.keySet()){
-//                if (command.toLowerCase().contains(hotword)){
-//                    // getSpeechFromUser the response
-//                    int speech = textToSpeech.getSpeechFromUser(hotwords.get(hotword),TextToSpeech.QUEUE_FLUSH,null );
-//                }
-//            }
 
             hotwords.put("schedule", () -> {
-                speak("Please give a description for the event");
                 editText.setText(command);
+
                 //Calling Event Description Fragment
                 dialogFragment=new EventDescDialog();
                 dialogFragment.show(getActivity().getSupportFragmentManager(),"dialog box");
 
-
-                purpose = "getDescription";
-                final Handler handler = new Handler(Looper.getMainLooper());
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        getSpeechFromUser();
-                    }
-                }, 3000);
-
-
+                initiateConversation("Please give a description for the event","getDescription", 3000);
 
                 // Making an event
                 ContentResolver cr= getActivity().getContentResolver();
