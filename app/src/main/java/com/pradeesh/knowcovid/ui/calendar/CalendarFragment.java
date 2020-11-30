@@ -9,6 +9,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.CalendarContract;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -20,6 +22,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,8 +53,9 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
         private TextView editText;
         private Button micButton,showEvents;
         Cursor cursor;
+        EventDescDialog dialogFragment;
         private int id=3;
-        private String sttResult = null;
+        private String purpose = null;
         private static final int REQUEST_CODE_SPEECH_INPUT=100;
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater,
@@ -65,7 +69,6 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
             }
             editText = root.findViewById(R.id.text);
             micButton = root.findViewById(R.id.voice_button);
-
             showEvents = root.findViewById(R.id.show_events);
 
             textToSpeech = new TextToSpeech(getContext().getApplicationContext(), new TextToSpeech.OnInitListener() {
@@ -87,8 +90,21 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
 //                    }
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        cursor = getActivity().getContentResolver().query(CalendarContract.Events.CONTENT_URI, null, null, null);
+                        Log.d("uri","Inside BuilVersion");
+                         cursor = getActivity().getContentResolver()
+                                .query(
+                                        Uri.parse("content://com.android.calendar/events"),
+                                        new String[] { "calendar_id", "title", "description",
+                                                "dtstart", "dtend", "eventLocation" }, null,
+                                        null, null);
+//                        cursor = getActivity().getContentResolver().query(CalendarContract.Events.CONTENT_URI, null, null, null);
+
+                        Log.d("uri",cursor.toString());
                     }
+                    if(cursor.moveToFirst())
+                        Log.d("uri","cursor is not empty");
+                    else
+                        Log.d("uri","is empty");
 
                     while (cursor.moveToNext()) {
                         if (cursor != null) {
@@ -119,11 +135,9 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
             micButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    speak();
-//                    if(sttResult != null) {
-//                        editText.setText(sttResult);
-//                        detectHotwords(sttResult);
-//                    }
+                    purpose="detectHotwords";
+                    getSpeechFromUser();
+
                 }
             });
             return root;
@@ -131,7 +145,7 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
 
 
 
-        private void speak(){
+        private void getSpeechFromUser(){
             Intent intent= new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
             intent .putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
@@ -152,9 +166,18 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
             switch(requestCode){
                 case REQUEST_CODE_SPEECH_INPUT:{
                     if(resultCode== RESULT_OK && null!=data){
-                        ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                        sttResult = result.get(0);
-                        detectHotwords(sttResult);
+                        String result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS).get(0);
+
+                        switch(purpose){
+                            case "detectHotwords":{
+                                detectHotwords(result);
+                                break;
+                            }
+                            case "getDescription":{
+                                dialogFragment.description.setText(result);
+                                break;
+                            }
+                        }
                     }
                     break;
                 }
@@ -185,6 +208,11 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
             }
         }
 
+        public void speak(String text){
+            int speech = textToSpeech.speak(text,TextToSpeech.QUEUE_FLUSH,null );
+
+        }
+
 
         public void detectHotwords(String command){
             HashMap<String, Runnable> hotwords = new HashMap();
@@ -194,17 +222,28 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
 //
 //            for(String hotword: hotwords.keySet()){
 //                if (command.toLowerCase().contains(hotword)){
-//                    // speak the response
-//                    int speech = textToSpeech.speak(hotwords.get(hotword),TextToSpeech.QUEUE_FLUSH,null );
+//                    // getSpeechFromUser the response
+//                    int speech = textToSpeech.getSpeechFromUser(hotwords.get(hotword),TextToSpeech.QUEUE_FLUSH,null );
 //                }
 //            }
 
             hotwords.put("schedule", () -> {
-                int speech = textToSpeech.speak("adding an event. Please give a description for the event",TextToSpeech.QUEUE_FLUSH,null );
-                editText.setText(sttResult);
+                speak("Please give a description for the event");
+                editText.setText(command);
                 //Calling Event Description Fragment
-                EventDescDialog dialogFragment=new EventDescDialog();
+                dialogFragment=new EventDescDialog();
                 dialogFragment.show(getActivity().getSupportFragmentManager(),"dialog box");
+
+
+                purpose = "getDescription";
+                final Handler handler = new Handler(Looper.getMainLooper());
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        getSpeechFromUser();
+                    }
+                }, 3000);
+
 
 
                 // Making an event
@@ -213,11 +252,11 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
                 cv.put(CalendarContract.Events.TITLE,"Event for Car Service");
                 cv.put(CalendarContract.Events.DTSTART, Calendar.getInstance().getTimeInMillis()+30*1000);
                 cv.put(CalendarContract.Events.DTEND, Calendar.getInstance().getTimeInMillis()+60*60*1000);
-                cv.put(CalendarContract.Events.CALENDAR_ID,90);
+                cv.put(CalendarContract.Events.CALENDAR_ID,15);
                 cv.put(CalendarContract.Events.EVENT_TIMEZONE,Calendar.getInstance().getTimeZone().getID());
 
                 Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI,cv);
-
+                Log.d("uri",uri.toString());
                 Toast.makeText(getContext(), "Event is successfully added", Toast.LENGTH_SHORT).show();
 
             });
