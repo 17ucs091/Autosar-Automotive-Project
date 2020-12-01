@@ -46,17 +46,17 @@
                 android:layout_height="30sp"
                 android:layout_marginRight="20sp"
 
-                android:text="Description"
+                android:text="Title"
                 android:textSize="24sp"                />
 
 
             <EditText
                 android:layout_width="300sp"
                 android:layout_height="wrap_content"
-                android:id="@+id/description"
+                android:id="@+id/title"
                 android:textSize="24sp"
                 android:textColor="@color/colorBlack"
-                android:hint="description"
+                android:hint="title"
                 />
 
         </LinearLayout>

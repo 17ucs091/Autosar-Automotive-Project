@@ -14,7 +14,7 @@ import java.util.ArrayList;
 public class EventsListAdapter extends ArrayAdapter {
     private Context context;
     private ArrayList<CustomModel> arrayList;
-    private TextView serialNum, name, contactNum;
+    private TextView eventTitle, date, startTime, endTime, participants;
     public EventsListAdapter(Context context, ArrayList<CustomModel> arrayList) {
         super(context,R.layout.fragment_show_events);
         this.context = context;
@@ -35,9 +35,14 @@ public class EventsListAdapter extends ArrayAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         convertView = LayoutInflater.from(context).inflate(R.layout.event_row, parent, false);
-//        serialNum = convertView.findViewById(R.id.serailNumber);
-//
-//        serialNum.setText(" " + arrayList.get(position));
+        eventTitle = convertView.findViewById(R.id.eventTitle);
+        date = convertView.findViewById(R.id.date);
+        startTime = convertView.findViewById(R.id.startTime);
+        endTime = convertView.findViewById(R.id.endTime);
+        participants = convertView.findViewById(R.id.participants);
+
+        eventTitle.setText(arrayList.get(position).getTitle());
+        participants.setText(arrayList.get(position).getParticipants());
 
         return convertView;
     }

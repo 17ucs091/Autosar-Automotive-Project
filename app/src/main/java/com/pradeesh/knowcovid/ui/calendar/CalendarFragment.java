@@ -102,7 +102,7 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
             Intent intent= new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
             intent .putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-            intent.putExtra(RecognizerIntent.EXTRA_PROMPT , "Give Event Description");
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT , "Give Event description");
 
             try{
                 startActivityForResult(intent, REQUEST_CODE_SPEECH_INPUT);
@@ -126,8 +126,23 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
                                 detectHotwords(result);
                                 break;
                             }
-                            case "getDescription":{
-                                dialogFragment.description.setText(result);
+                            case "getTitle":{
+                                dialogFragment.title.setText(result);
+                                initiateConversation("What is the date for the event?", "getDate", 3000);
+                                break;
+                            }
+                            case "getDate":{
+                                dialogFragment.date.setText(result);
+                                initiateConversation("When will the event start?", "getStartTime", 3000);
+                                break;
+                            }
+                            case "getStartTime":{
+                                dialogFragment.startTime.setText(result);
+                                initiateConversation("When will the event end?", "getEndTime", 3000);
+                                break;
+                            }
+                            case "getEndTime":{
+                                dialogFragment.endTime.setText(result);
                                 initiateConversation("Do you want to add any participants for the event?", "askForParticipants", 3000);
                                 break;
                             }
@@ -143,7 +158,7 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
                             }
                             case "getParticipants":{
                                 String previousParticipants = dialogFragment.participants.getText().toString();
-                                dialogFragment.participants.setText(((previousParticipants == "")?previousParticipants:(previousParticipants + ", ")) + result);
+                                dialogFragment.participants.setText(((previousParticipants.length() == 0)?previousParticipants:(previousParticipants + ", ")) + result);
                                 initiateConversation("Do you want to add more participants ?", "askForParticipants", 3000);
 
                                 break;
@@ -157,14 +172,14 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
 
         private void addToDatabase() {
             CustomModel event;
-             String description=dialogFragment.description.getText().toString();
+             String title=dialogFragment.title.getText().toString();
              long startTime=1606846786486L;
              long endTime=1606856786486L;
 
-             String participants= dialogFragment.description.getText().toString();
+             String participants= dialogFragment.title.getText().toString();
             try {
 
-                event = new CustomModel(-1,description,participants, startTime, endTime);
+                event = new CustomModel(-1,title,participants, startTime, endTime);
                 Toast.makeText(getActivity(), event.toString(), Toast.LENGTH_LONG).show();
 
                 Databasehelper databasehelper=new Databasehelper(getActivity());
@@ -229,11 +244,11 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
             hotwords.put("schedule", () -> {
                 editText.setText(command);
 
-                //Calling Event Description Fragment
+                //Calling Event title Fragment
                 dialogFragment=new EventDescDialog();
                 dialogFragment.show(getActivity().getSupportFragmentManager(),"dialog box");
 
-                initiateConversation("Please give a description for the event","getDescription", 3000);
+                initiateConversation("Please give a title for the event","getTitle", 3000);
             });
 
             for(String hotword: hotwords.keySet()){

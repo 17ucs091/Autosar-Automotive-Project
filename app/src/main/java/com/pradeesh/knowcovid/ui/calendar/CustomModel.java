@@ -6,15 +6,15 @@ import java.util.Arrays;
 public class CustomModel {
 
     private int eventID=-1;
-    private String description="";
+    private String title="";
     private String participants;
     private long startTime=0;
     private long endTime=0;
 
 
-    public CustomModel(int eventID, String description, String participants, long startTime, long endTime) {
+    public CustomModel(int eventID, String title, String participants, long startTime, long endTime) {
         this.eventID = eventID;
-        this.description = description;
+        this.title = title;
         this.participants = participants;
         this.startTime = startTime;
         this.endTime = endTime;
@@ -24,7 +24,7 @@ public class CustomModel {
     public String toString() {
         return "CustomModel{" +
                 "eventID=" + eventID +
-                ", description='" + description + '\'' +
+                ", title='" + title + '\'' +
                 ", participants=" + participants +
                 ", startTime=" + startTime +
                 ", endTime=" + endTime +
@@ -39,12 +39,12 @@ public class CustomModel {
         this.eventID = eventID;
     }
 
-    public String getDescription() {
-        return description;
+    public String getTitle() {
+        return title;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getParticipants() {

@@ -82,6 +82,9 @@ dependencies {
 
     //Event Bus
     implementation 'org.greenrobot:eventbus:3.0.0'
+    
+    //Card View Implementation
+    implementation 'androidx.cardview:cardview:1.0.0'
 
     //Car data
    // implementation files('libs/androidcar.jar')

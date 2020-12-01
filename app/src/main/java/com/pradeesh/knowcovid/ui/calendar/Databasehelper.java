@@ -15,7 +15,7 @@ public class Databasehelper extends SQLiteOpenHelper {
 
     public static final String EVENTS_TABLE="EVENT_TABLE";
     public static final String EVENT_ID="EVENT_ID";
-    public static final String EVENT_DESCRIPTION="EVENT_DESCRIPTION";
+    public static final String EVENT_TITLE="EVENT_TITLE";
     public static final String EVENT_PARTICIPANTS="EVENT_PARTICIPANTS";
     public static final String EVENT_START_TIME="EVENT_START_TIME";
     public static final String EVENT_END_TIME="EVENT_END_TIME";
@@ -27,7 +27,7 @@ public class Databasehelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String createTableStatement= "CREATE TABLE " + EVENTS_TABLE+ " (" + EVENT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + EVENT_DESCRIPTION
+        String createTableStatement= "CREATE TABLE " + EVENTS_TABLE+ " (" + EVENT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + EVENT_TITLE
                 + " TEXT, " + EVENT_PARTICIPANTS + " TEXT, " + EVENT_START_TIME + " INTEGER, " + EVENT_END_TIME + " INTEGER )";
 
         db.execSQL(createTableStatement);
@@ -42,7 +42,7 @@ public class Databasehelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues cv = new ContentValues();
-        cv.put(EVENT_DESCRIPTION , customModel.getDescription());
+        cv.put(EVENT_TITLE , customModel.getTitle());
         cv.put(EVENT_PARTICIPANTS , customModel.getParticipants());
         cv.put(EVENT_START_TIME, customModel.getStartTime());
         cv.put(EVENT_END_TIME,customModel.getEndTime());
@@ -61,12 +61,12 @@ public class Databasehelper extends SQLiteOpenHelper {
 
         while(cursor.moveToNext()){
             int eventID= cursor.getInt(0);
-            String description = cursor.getString(1);
+            String title = cursor.getString(1);
             String participants = cursor.getString(2);
             int startTime= cursor.getInt(3);
             int endTime = cursor.getInt(4);
 
-            CustomModel event = new CustomModel(eventID,description,participants,startTime,endTime);
+            CustomModel event = new CustomModel(eventID,title,participants,startTime,endTime);
             eventsList.add(event);
         }
 
