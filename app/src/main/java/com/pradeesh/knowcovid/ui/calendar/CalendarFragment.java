@@ -77,15 +77,15 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
                 }
             });
 
-
-            showEvents.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-                    Navigation.createNavigateOnClickListener(R.id.action_navigation_calendar_to_showEventsFragment);
-
-                }
-            });
+            showEvents.setOnClickListener( Navigation.createNavigateOnClickListener(R.id.navigation_showEventsFragment));
+//            showEvents.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//
+//                    Navigation.createNavigateOnClickListener(R.id.navigation_showEventsFragment);
+//
+//                }
+//            });
 
             micButton.setOnClickListener(new View.OnClickListener() {
                 @Override

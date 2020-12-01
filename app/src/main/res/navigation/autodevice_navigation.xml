@@ -12,10 +12,10 @@
         tools:layout="@layout/fragment_cal">
         <action
             android:id="@+id/action_navigation_calendar_to_showEventsFragment"
-            app:destination="@id/showEventsFragment" />
+            app:destination="@id/navigation_showEventsFragment" />
     </fragment>
     <fragment
-        android:id="@+id/showEventsFragment"
+        android:id="@+id/navigation_showEventsFragment"
         android:name="com.pradeesh.knowcovid.ui.calendar.ShowEventsFragment"
         android:label="fragment_show_events"
         tools:layout="@layout/fragment_show_events" />
