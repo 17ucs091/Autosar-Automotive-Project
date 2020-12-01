@@ -11,7 +11,7 @@
         android:label="Calendar Management"
         tools:layout="@layout/fragment_cal">
         <action
-            android:id="@+id/action_navigation_calendar_to_showEventsFragment"
+            android:id="@+id/calendarToShowEvents"
             app:destination="@id/navigation_showEventsFragment" />
     </fragment>
     <fragment

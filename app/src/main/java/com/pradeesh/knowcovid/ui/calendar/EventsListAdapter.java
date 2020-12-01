@@ -1,22 +1,23 @@
 package com.pradeesh.knowcovid.ui.calendar;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.pradeesh.knowcovid.R;
 
 import java.util.ArrayList;
 
-public class EventsListAdapter extends ArrayAdapter {
+public class EventsListAdapter extends BaseAdapter {
     private Context context;
     private ArrayList<CustomModel> arrayList;
     private TextView eventTitle, date, startTime, endTime, participants;
     public EventsListAdapter(Context context, ArrayList<CustomModel> arrayList) {
-        super(context,R.layout.fragment_show_events);
         this.context = context;
         this.arrayList = arrayList;
     }
@@ -43,7 +44,6 @@ public class EventsListAdapter extends ArrayAdapter {
 
         eventTitle.setText(arrayList.get(position).getTitle());
         participants.setText(arrayList.get(position).getParticipants());
-
         return convertView;
     }
 }

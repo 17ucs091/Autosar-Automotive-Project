@@ -26,18 +26,20 @@ public class ShowEventsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View root = inflater.inflate(R.layout.fragment_cal, container, false);
+        View root = inflater.inflate(R.layout.fragment_show_events, container, false);
 
         listView = root.findViewById(R.id.listView);
+
+        getEventsFromDB();
         return root;
     }
 
-    public void showEvents(){
+    public void getEventsFromDB(){
         Databasehelper databasehelper= new Databasehelper(getActivity());
 
         ArrayList<CustomModel> events=databasehelper.getEvents();
-//        EventsListAdapter myAdapter=new EventsListAdapter(getActivity(),events);
-//        listView.setAdapter(myAdapter);
-        Toast.makeText(getActivity(),events.toString(),Toast.LENGTH_LONG).show();
+        EventsListAdapter myAdapter=new EventsListAdapter(getActivity(),events);
+        listView.setAdapter(myAdapter);
+//        Toast.makeText(getActivity(),events.toString(),Toast.LENGTH_LONG).show();
     }
 }

@@ -12,6 +12,7 @@ import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,15 +78,12 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
                 }
             });
 
-            showEvents.setOnClickListener( Navigation.createNavigateOnClickListener(R.id.navigation_showEventsFragment));
-//            showEvents.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//
-//                    Navigation.createNavigateOnClickListener(R.id.navigation_showEventsFragment);
-//
-//                }
-//            });
+            showEvents.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Navigation.findNavController(root).navigate(R.id.navigation_showEventsFragment);
+                }
+            });
 
             micButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -176,7 +174,7 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
              long startTime=1606846786486L;
              long endTime=1606856786486L;
 
-             String participants= dialogFragment.title.getText().toString();
+             String participants= dialogFragment.participants.getText().toString();
             try {
 
                 event = new CustomModel(-1,title,participants, startTime, endTime);

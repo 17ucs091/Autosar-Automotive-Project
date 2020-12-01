@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -13,7 +14,7 @@ import java.util.List;
 
 public class Databasehelper extends SQLiteOpenHelper {
 
-    public static final String EVENTS_TABLE="EVENT_TABLE";
+    public static final String EVENTS_TABLE="EVENTS_TABLE";
     public static final String EVENT_ID="EVENT_ID";
     public static final String EVENT_TITLE="EVENT_TITLE";
     public static final String EVENT_PARTICIPANTS="EVENT_PARTICIPANTS";
@@ -34,8 +35,10 @@ public class Databasehelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-
+    public void onUpgrade(SQLiteDatabase db, int i, int i1) {
+        Log.d("uri","OnUpgrade");
+        db.execSQL("DROP TABLE IF EXISTS "+EVENTS_TABLE);
+        onCreate(db);
     }
 
     public boolean addEvent(CustomModel customModel){

@@ -12,6 +12,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
 import com.pradeesh.knowcovid.model.VehicleEventMessage;
 
 import androidx.annotation.NonNull;
@@ -44,12 +45,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         BottomNavigationView navView = findViewById(R.id.nav_view);
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-//                R.id.navigation_home,
-//                R.id.navigation_dashboard,
-//                R.id.navigation_map, R.id.rss_feed ,
-//                R.id.navigation_showEventsFragment,
                 R.id.navigation_calendar)
                 .build();
+
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupWithNavController(navView, navController);
 
