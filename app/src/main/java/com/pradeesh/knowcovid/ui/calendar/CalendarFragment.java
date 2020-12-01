@@ -28,6 +28,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.navigation.Navigation;
 
 import com.pradeesh.knowcovid.R;
 import java.util.ArrayList;
@@ -46,11 +47,7 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
         private TextToSpeech textToSpeech;
         private TextView editText;
         private Button micButton,showEvents;
-        private String description;
-        private long startTime=1606846786486L;
-        private long endTime=1606856786486L;
 
-        private ArrayList<String> participants_G;
         Cursor cursor;
         EventDescDialog dialogFragment;
         private String purpose = null;
@@ -66,7 +63,6 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
             if (ContextCompat.checkSelfPermission(root.getContext(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
                 checkPermission();
             }
-            participants_G=new ArrayList<String>();
             editText = root.findViewById(R.id.text);
             micButton = root.findViewById(R.id.voice_button);
             showEvents = root.findViewById(R.id.show_events);
@@ -86,48 +82,8 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
                 @Override
                 public void onClick(View view) {
 
-                    Databasehelper databasehelper= new Databasehelper(getActivity());
-                    List<CustomModel> events=databasehelper.getEvents();
+                    Navigation.createNavigateOnClickListener(R.id.action_navigation_calendar_to_showEventsFragment);
 
-                    Toast.makeText(getActivity(),events.toString(),Toast.LENGTH_LONG).show();
-
-
-//                    if (ActivityCompat.checkSelfPermission(Objects.requireNonNull(getContext()), Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
-//                        return;
-//                    }
-
-//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                        Log.d("uri","Inside BuilVersion");
-//                        cursor = getActivity().getContentResolver().query(CalendarContract.Events.CONTENT_URI, null, null, null);
-//
-//                        Log.d("uri",CalendarContract.Events.CONTENT_URI.toString());
-//                    }
-//                    if(cursor.moveToFirst())
-//                        Log.d("uri","cursor is not empty");
-//                    else
-//                        Log.d("uri","is empty");
-//
-//                    while (cursor.moveToNext()) {
-//                        Log.d("dsd","DownLog");
-//                        if (cursor != null) {
-//
-//                            int val1 = cursor.getColumnIndex(CalendarContract.Events._ID);
-//                            int val2 = cursor.getColumnIndex(CalendarContract.Events.TITLE);
-//                            int val3 = cursor.getColumnIndex(CalendarContract.Events.DTSTART);
-//                            int val4 = cursor.getColumnIndex(CalendarContract.Events.DTEND);
-//
-//                            String ID_val = cursor.getColumnName(val1);
-//                            String title_val = cursor.getColumnName(val2);
-//                            String sTime_val = cursor.getColumnName(val3);
-//                            String eTime = cursor.getColumnName(val4);
-//
-//                            Toast.makeText(getContext(), ID_val + " " + title_val + " " + sTime_val + " " + eTime, Toast.LENGTH_LONG).show();
-//
-//                        } else {
-//                            Toast.makeText(getContext(), "Event is not Present", Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-//                    Log.d("dsd","DownLog");
                 }
             });
 
@@ -172,7 +128,6 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
                             }
                             case "getDescription":{
                                 dialogFragment.description.setText(result);
-                                description=result;
                                 initiateConversation("Do you want to add any participants for the event?", "askForParticipants", 3000);
                                 break;
                             }
@@ -181,12 +136,7 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
                                     initiateConversation("Please speak the participant name", "getParticipants", 3000);
                                 } else {
                                     speak("Okay, Finished.");
-
                                     addToDatabase();
-
-                                    description="";
-                                    participants_G.clear();
-
                                 }
 
                                 break;
@@ -194,7 +144,6 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
                             case "getParticipants":{
                                 String previousParticipants = dialogFragment.participants.getText().toString();
                                 dialogFragment.participants.setText(((previousParticipants == "")?previousParticipants:(previousParticipants + ", ")) + result);
-                                participants_G.add(result);
                                 initiateConversation("Do you want to add more participants ?", "askForParticipants", 3000);
 
                                 break;
@@ -208,8 +157,14 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
 
         private void addToDatabase() {
             CustomModel event;
+             String description=dialogFragment.description.getText().toString();
+             long startTime=1606846786486L;
+             long endTime=1606856786486L;
+
+             String participants= dialogFragment.description.getText().toString();
             try {
-                event = new CustomModel(-1,description, TextUtils.join(", ", participants_G), startTime, endTime);
+
+                event = new CustomModel(-1,description,participants, startTime, endTime);
                 Toast.makeText(getActivity(), event.toString(), Toast.LENGTH_LONG).show();
 
                 Databasehelper databasehelper=new Databasehelper(getActivity());
@@ -279,20 +234,6 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
                 dialogFragment.show(getActivity().getSupportFragmentManager(),"dialog box");
 
                 initiateConversation("Please give a description for the event","getDescription", 3000);
-
-                // Making an event
-//                ContentResolver cr= getActivity().getContentResolver();
-//                ContentValues cv= new ContentValues();
-//                cv.put(CalendarContract.Events.TITLE,"Event for Car Service");
-//                cv.put(CalendarContract.Events.DTSTART, Calendar.getInstance().getTimeInMillis()+30*1000);
-//                cv.put(CalendarContract.Events.DTEND, Calendar.getInstance().getTimeInMillis()+60*60*1000);
-//                cv.put(CalendarContract.Events.CALENDAR_ID,15);
-//                cv.put(CalendarContract.Events.EVENT_TIMEZONE,Calendar.getInstance().getTimeZone().getID());
-//
-//                Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI,cv);
-//                Log.d("uri",uri.toString());
-//                Toast.makeText(getContext(), "Event is successfully added", Toast.LENGTH_SHORT).show();
-
             });
 
             for(String hotword: hotwords.keySet()){

@@ -35,6 +35,8 @@
     <string name="rss_headline_title">RSS headline ...</string>
 
     <string name="brought_you_by"> - Mohit And Subhajit</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>

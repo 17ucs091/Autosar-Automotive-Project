@@ -51,8 +51,8 @@ public class Databasehelper extends SQLiteOpenHelper {
         return insert != -1;
     }
 
-    public List<CustomModel> getEvents(){
-        List<CustomModel> eventsList = new ArrayList<CustomModel>();
+    public ArrayList<CustomModel> getEvents(){
+        ArrayList<CustomModel> eventsList = new ArrayList<CustomModel>();
 
         String getAllQuery= "SELECT * FROM "+ EVENTS_TABLE;
         SQLiteDatabase db= this.getReadableDatabase();

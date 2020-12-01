@@ -9,7 +9,16 @@
         android:id="@+id/navigation_calendar"
         android:name="com.pradeesh.knowcovid.ui.calendar.CalendarFragment"
         android:label="Calendar Management"
-        tools:layout="@layout/fragment_cal" />
+        tools:layout="@layout/fragment_cal">
+        <action
+            android:id="@+id/action_navigation_calendar_to_showEventsFragment"
+            app:destination="@id/showEventsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/showEventsFragment"
+        android:name="com.pradeesh.knowcovid.ui.calendar.ShowEventsFragment"
+        android:label="fragment_show_events"
+        tools:layout="@layout/fragment_show_events" />
 
     <!--    <fragment-->
     <!--        android:id="@+id/navigation_home"-->
