@@ -80,6 +80,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/participants"
                 android:textSize="24sp"
+                android:textColor="@color/colorBlack"
                 android:hint="particpants"
                 />
 
