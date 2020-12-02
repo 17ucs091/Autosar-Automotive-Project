@@ -32,6 +32,8 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.Navigation;
 
 import com.pradeesh.knowcovid.R;
+import com.pradeesh.knowcovid.ui.calendar.Worker.WorkReminderHelper;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -121,7 +123,9 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
 
                         switch(purpose){
                             case "detectHotwords":{
+                                Log.d("uri","to detect hotwords");
                                 detectHotwords(result);
+
                                 break;
                             }
                             case "getTitle":{
@@ -150,6 +154,8 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
                                 } else {
                                     speak("Okay, Finished.");
                                     addToDatabase();
+
+
                                 }
 
                                 break;
@@ -169,26 +175,82 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
         }
 
         private void addToDatabase() {
-            CustomModel event;
-             String title=dialogFragment.title.getText().toString();
-             long startTime=1606846786486L;
-             long endTime=1606856786486L;
 
+             String title=dialogFragment.title.getText().toString();
+             String date = dialogFragment.date.getText().toString();
+             String startTime = dialogFragment.startTime.getText().toString();
+             String endTime = dialogFragment.endTime.getText().toString();
              String participants= dialogFragment.participants.getText().toString();
+             String eventID= title+date+startTime+endTime+participants;
+
+             Log.d("uri",eventID);
+
+             int extractedDate=0 ,extractedHour=0 , extractedMinutes=0;
+
+             for(int i=0;i<date.length();i++){
+                 if(  date.charAt(i)-'0'>=1 && date.charAt(i)-'0'<=9 ){
+                     extractedDate=(date.charAt(i)-'0');
+                     if(date.charAt(i+1)-'0'>=0 && date.charAt(i+1)-'0'<=9){
+                         extractedDate=10*(extractedDate)+(date.charAt(i+1)-'0');
+                     }
+                     break;
+                 }
+             }
+            //extract hours from user given starTime
+            if(startTime.charAt(0)-'0'>=0 && startTime.charAt(0)-'0'<=9){
+                extractedHour=startTime.charAt(0)-'0';
+                if(startTime.charAt(1)-'0'>=0 && startTime.charAt(1)-'0'<=9) {
+                    extractedHour = extractedHour*10+(startTime.charAt(1) - '0');
+                }
+            }
+            for(int i=0;i<startTime.length();i++){
+                if(startTime.charAt(i)=='p') {
+                    extractedHour += 12;
+                    break;
+                }
+            }
+            //extract minutes from user given starTime
+            int startOfMinuteIndex=2;
+            if(startTime.charAt(2)-'0'<0 || startTime.charAt(2)-'0'>9)
+                startOfMinuteIndex++;
+            if(startTime.charAt(startOfMinuteIndex)-'0'>=0 && startTime.charAt(startOfMinuteIndex)-'0'<=9){
+                extractedMinutes=startTime.charAt(startOfMinuteIndex)-'0';
+                if(startTime.charAt(startOfMinuteIndex+1)-'0'>=0 && startTime.charAt(startOfMinuteIndex+1)-'0'<=9) {
+                    extractedMinutes = extractedMinutes*10+(startTime.charAt(startOfMinuteIndex+1) - '0');
+                }
+            }
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    extractedDate,
+                    extractedHour,
+                    extractedMinutes,
+                    0);
+            CustomModel event;
             try {
 
-                event = new CustomModel(-1,title,participants, startTime, endTime);
-                Toast.makeText(getActivity(), event.toString(), Toast.LENGTH_LONG).show();
+                long sTime=calendar.getTimeInMillis();
+                long eTime=calendar.getTimeInMillis();
+                Log.d("uri", String.valueOf(calendar.getTimeInMillis())+"  sTime: "+sTime);
+
+                event = new CustomModel(eventID , title , date , participants , sTime ,  eTime);
+
+//                Toast.makeText(getActivity(), event.toString(), Toast.LENGTH_LONG).show();
 
                 Databasehelper databasehelper=new Databasehelper(getActivity());
                 boolean success = databasehelper.addEvent(event);
+
+                WorkReminderHelper reminderHelper = new WorkReminderHelper();
+                reminderHelper.setReminder(getActivity(), eventID, title , "Event is Today from "+ startTime + " to "+endTime,sTime);
+
                 if(success)
                 Toast.makeText(getActivity() , "EVENT IS SUCCESSFULLY ADDED" ,Toast.LENGTH_SHORT).show();
             }
             catch (Exception e){
                 Toast.makeText(getActivity(), "Error adding event", Toast.LENGTH_SHORT).show();
             }
-
 
         }
 

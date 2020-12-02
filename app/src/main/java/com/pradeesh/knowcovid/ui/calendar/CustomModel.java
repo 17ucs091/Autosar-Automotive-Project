@@ -1,20 +1,24 @@
 package com.pradeesh.knowcovid.ui.calendar;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class CustomModel {
 
-    private int eventID=-1;
+    private String eventID="";
     private String title="";
+    private String date="";
     private String participants;
     private long startTime=0;
     private long endTime=0;
 
-
-    public CustomModel(int eventID, String title, String participants, long startTime, long endTime) {
+    public CustomModel(String eventID, String title, String date, String participants, long startTime, long endTime) {
+        Log.d("uri","Inside customModel");
         this.eventID = eventID;
         this.title = title;
+        this.date = date;
         this.participants = participants;
         this.startTime = startTime;
         this.endTime = endTime;
@@ -23,19 +27,20 @@ public class CustomModel {
     @Override
     public String toString() {
         return "CustomModel{" +
-                "eventID=" + eventID +
+                "eventID='" + eventID + '\'' +
                 ", title='" + title + '\'' +
-                ", participants=" + participants +
+                ", date='" + date + '\'' +
+                ", participants='" + participants + '\'' +
                 ", startTime=" + startTime +
                 ", endTime=" + endTime +
                 '}';
     }
 
-    public int getEventID() {
+    public String getEventID() {
         return eventID;
     }
 
-    public void setEventID(int eventID) {
+    public void setEventID(String eventID) {
         this.eventID = eventID;
     }
 
@@ -47,8 +52,16 @@ public class CustomModel {
         this.title = title;
     }
 
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
     public String getParticipants() {
-        return participants.toString();
+        return participants;
     }
 
     public void setParticipants(String participants) {

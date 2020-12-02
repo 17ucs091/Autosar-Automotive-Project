@@ -80,11 +80,20 @@ dependencies {
 
     implementation 'com.orhanobut:dialogplus:1.11@aar'
 
+
     //Event Bus
     implementation 'org.greenrobot:eventbus:3.0.0'
     
     //Card View Implementation
     implementation 'androidx.cardview:cardview:1.0.0'
+
+
+
+    //WorkManager
+    def work_version = "2.4.0"
+    // (Java only)
+    implementation "androidx.work:work-runtime:$work_version"
+
 
     //Car data
    // implementation files('libs/androidcar.jar')

@@ -17,6 +17,7 @@ public class Databasehelper extends SQLiteOpenHelper {
     public static final String EVENTS_TABLE="EVENTS_TABLE";
     public static final String EVENT_ID="EVENT_ID";
     public static final String EVENT_TITLE="EVENT_TITLE";
+    public static final String EVENT_DATE="EVENT_DATE";
     public static final String EVENT_PARTICIPANTS="EVENT_PARTICIPANTS";
     public static final String EVENT_START_TIME="EVENT_START_TIME";
     public static final String EVENT_END_TIME="EVENT_END_TIME";
@@ -28,8 +29,8 @@ public class Databasehelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String createTableStatement= "CREATE TABLE " + EVENTS_TABLE+ " (" + EVENT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + EVENT_TITLE
-                + " TEXT, " + EVENT_PARTICIPANTS + " TEXT, " + EVENT_START_TIME + " INTEGER, " + EVENT_END_TIME + " INTEGER )";
+        String createTableStatement= "CREATE TABLE " + EVENTS_TABLE+ " (" + EVENT_ID + " TEXT PRIMARY KEY , " + EVENT_TITLE
+                + " TEXT, "+ EVENT_DATE + " TEXT, " + EVENT_PARTICIPANTS + " TEXT, " + EVENT_START_TIME + " INTEGER, " + EVENT_END_TIME + " INTEGER )";
 
         db.execSQL(createTableStatement);
     }
@@ -45,12 +46,15 @@ public class Databasehelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues cv = new ContentValues();
+        cv.put(EVENT_ID,customModel.getEventID());
         cv.put(EVENT_TITLE , customModel.getTitle());
+        cv.put(EVENT_DATE,customModel.getDate());
         cv.put(EVENT_PARTICIPANTS , customModel.getParticipants());
         cv.put(EVENT_START_TIME, customModel.getStartTime());
         cv.put(EVENT_END_TIME,customModel.getEndTime());
 
         long insert= db.insert(EVENTS_TABLE , null , cv);
+        Log.d("uri",customModel.getEventID());
         return insert != -1;
     }
 
@@ -63,17 +67,26 @@ public class Databasehelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(getAllQuery, null);
 
         while(cursor.moveToNext()){
-            int eventID= cursor.getInt(0);
+            String eventID= cursor.getString(0);
             String title = cursor.getString(1);
-            String participants = cursor.getString(2);
-            int startTime= cursor.getInt(3);
-            int endTime = cursor.getInt(4);
+            String date=cursor.getString(2);
+            String participants = cursor.getString(3);
+            int startTime= cursor.getInt(4);
+            int endTime = cursor.getInt(5);
 
-            CustomModel event = new CustomModel(eventID,title,participants,startTime,endTime);
+            CustomModel event = new CustomModel(eventID,title, date ,participants,startTime,endTime);
             eventsList.add(event);
         }
 
         return eventsList;
+
+    }
+    public void deleteEventByID(String eventID){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String deleteQuery= "DELETE FROM "+ EVENTS_TABLE + "WHERE "+EVENT_ID + " = "+eventID;
+
+        db.execSQL(deleteQuery);
 
     }
 }
