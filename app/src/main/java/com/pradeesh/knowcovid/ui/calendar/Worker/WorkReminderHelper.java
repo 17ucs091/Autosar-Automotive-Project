@@ -14,6 +14,7 @@ public class WorkReminderHelper {
 
     public void setReminder(Context context ,String eventID, String eventTitle , String eventBody , long eventTime ){
 
+        Log.d("uri","Inside SetReminder");
 
         Data data =new Data.Builder()
                 .putString("eventID",eventID)

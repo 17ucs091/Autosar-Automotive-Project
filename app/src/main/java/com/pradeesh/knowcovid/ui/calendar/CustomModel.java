@@ -2,9 +2,6 @@ package com.pradeesh.knowcovid.ui.calendar;
 
 import android.util.Log;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 public class CustomModel {
 
     private String eventID="";
@@ -15,7 +12,6 @@ public class CustomModel {
     private long endTime=0;
 
     public CustomModel(String eventID, String title, String date, String participants, long startTime, long endTime) {
-        Log.d("uri","Inside customModel");
         this.eventID = eventID;
         this.title = title;
         this.date = date;

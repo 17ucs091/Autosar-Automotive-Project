@@ -123,7 +123,6 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
 
                         switch(purpose){
                             case "detectHotwords":{
-                                Log.d("uri","to detect hotwords");
                                 detectHotwords(result);
 
                                 break;
@@ -176,14 +175,17 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
 
         private void addToDatabase() {
 
+             CustomModel event;
+
              String title=dialogFragment.title.getText().toString();
              String date = dialogFragment.date.getText().toString();
              String startTime = dialogFragment.startTime.getText().toString();
              String endTime = dialogFragment.endTime.getText().toString();
              String participants= dialogFragment.participants.getText().toString();
              String eventID= title+date+startTime+endTime+participants;
-
-             Log.d("uri",eventID);
+             eventID=eventID.replaceAll("\\s+", "");
+             eventID=eventID.replaceAll("\\.", "");
+             eventID=eventID.replaceAll(":", "");
 
              int extractedDate=0 ,extractedHour=0 , extractedMinutes=0;
 
@@ -228,16 +230,14 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
                     extractedHour,
                     extractedMinutes,
                     0);
-            CustomModel event;
+
             try {
 
                 long sTime=calendar.getTimeInMillis();
                 long eTime=calendar.getTimeInMillis();
-                Log.d("uri", String.valueOf(calendar.getTimeInMillis())+"  sTime: "+sTime);
+                Log.d("uri", "sTime: "+sTime);
 
                 event = new CustomModel(eventID , title , date , participants , sTime ,  eTime);
-
-//                Toast.makeText(getActivity(), event.toString(), Toast.LENGTH_LONG).show();
 
                 Databasehelper databasehelper=new Databasehelper(getActivity());
                 boolean success = databasehelper.addEvent(event);
@@ -260,7 +260,7 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
         @Override
         public void onDestroy() {
             super.onDestroy();
-            speechRecognizer.destroy();
+//            speechRecognizer.destroy();
         }
 
         private void checkPermission() {

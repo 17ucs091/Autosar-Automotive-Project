@@ -37,7 +37,6 @@ public class Databasehelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
-        Log.d("uri","OnUpgrade");
         db.execSQL("DROP TABLE IF EXISTS "+EVENTS_TABLE);
         onCreate(db);
     }
@@ -53,8 +52,8 @@ public class Databasehelper extends SQLiteOpenHelper {
         cv.put(EVENT_START_TIME, customModel.getStartTime());
         cv.put(EVENT_END_TIME,customModel.getEndTime());
 
+
         long insert= db.insert(EVENTS_TABLE , null , cv);
-        Log.d("uri",customModel.getEventID());
         return insert != -1;
     }
 
@@ -77,16 +76,10 @@ public class Databasehelper extends SQLiteOpenHelper {
             CustomModel event = new CustomModel(eventID,title, date ,participants,startTime,endTime);
             eventsList.add(event);
         }
-
         return eventsList;
-
     }
     public void deleteEventByID(String eventID){
         SQLiteDatabase db = this.getWritableDatabase();
-
-        String deleteQuery= "DELETE FROM "+ EVENTS_TABLE + "WHERE "+EVENT_ID + " = "+eventID;
-
-        db.execSQL(deleteQuery);
-
+        db.delete(EVENTS_TABLE, EVENT_ID + "='"+eventID+"'", null);
     }
 }
