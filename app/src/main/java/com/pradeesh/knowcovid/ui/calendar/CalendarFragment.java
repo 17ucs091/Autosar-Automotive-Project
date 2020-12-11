@@ -254,6 +254,7 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
                 long eTime=extractTimeInMillis(endTime, date);
                 Log.d("uri", "sTime: "+sTime);
 
+
                 event = new CustomModel(eventID , title , date , participants , sTime ,  eTime);
 
                 Databasehelper databasehelper=new Databasehelper(getActivity());

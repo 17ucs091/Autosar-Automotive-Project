@@ -14,8 +14,6 @@ public class WorkReminderHelper {
 
     public void setReminder(Context context ,String eventID, String eventTitle , String eventBody , long eventTime ){
 
-        Log.d("uri","Inside SetReminder");
-
         Data data =new Data.Builder()
                 .putString("eventID",eventID)
                 .putString("eventTitle",eventTitle)
@@ -25,8 +23,6 @@ public class WorkReminderHelper {
 
 
         long delay=eventTime- Calendar.getInstance().getTimeInMillis();
-        Log.d("uri1", String.valueOf(delay));
-        Log.d("uri1",eventID);
         OneTimeWorkRequest setReminderRequest =new OneTimeWorkRequest.Builder(ReminderWorker.class)
                 .setInputData(data)
                 .setInitialDelay(delay, TimeUnit.MILLISECONDS)

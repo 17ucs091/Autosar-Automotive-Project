@@ -21,8 +21,6 @@ public class NotificationHelper
 
     public NotificationHelper(Context context)
     {
-//        super(ctx);
-//        String ChannelID="1234";
         Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://"+ context.getPackageName() + "/" + R.raw.mysoundone);
         // For API 26+ create notification channels
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

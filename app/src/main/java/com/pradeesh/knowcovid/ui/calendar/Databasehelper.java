@@ -73,8 +73,6 @@ public class Databasehelper extends SQLiteOpenHelper {
             long startTime= cursor.getLong(4);
             long endTime = cursor.getLong(5);
 
-            Log.d("uri", String.valueOf(startTime));
-
             CustomModel event = new CustomModel(eventID,title, date ,participants,startTime,endTime);
             eventsList.add(event);
         }

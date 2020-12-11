@@ -14,6 +14,7 @@ import com.pradeesh.knowcovid.R;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public class EventsListAdapter extends BaseAdapter {
@@ -55,25 +56,10 @@ public class EventsListAdapter extends BaseAdapter {
     }
 
     String getDisplayTime(long millis){
-//        SimpleDateFormat formatter = new SimpleDateFormat( "dd/MM/yyyy hh:mm:ss.SSS");
-//
-//        // Create a calendar object that will convert the date and time value in milliseconds to date.
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.setTimeInMillis(millis);
+        SimpleDateFormat formatter = new SimpleDateFormat( "hh:mm aa");
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(millis);
 
-        Log.d("uri", "In event display "+ String.valueOf(millis));
-        int minutes = (int) ((millis / (1000*60)) % 60);
-        minutes = (minutes+30)%60;
-        int hours   = (int) ((millis / (1000*60*60)) % 24);
-        String amPm = "AM";
-        hours = (hours+6)%24;
-        if(hours>12){
-            hours -= 12;
-            amPm = "PM";
-        } else if(hours == 12){
-            amPm = "PM";
-        }
-
-        return String.valueOf(hours) + ":" + String.valueOf(minutes) + " " + amPm;
+        return formatter.format(calendar.getTime());
     }
 }
