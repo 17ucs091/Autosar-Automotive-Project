@@ -11,7 +11,10 @@ import android.widget.TextView;
 
 import com.pradeesh.knowcovid.R;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 public class EventsListAdapter extends BaseAdapter {
     private Context context;
@@ -44,7 +47,6 @@ public class EventsListAdapter extends BaseAdapter {
 
         eventTitle.setText(arrayList.get(position).getTitle());
         participants.setText(arrayList.get(position).getParticipants());
-        Log.d("uri", arrayList.get(position).getDate());
         date.setText(arrayList.get(position).getDate());
         startTime.setText(getDisplayTime(arrayList.get(position).getStartTime()));
         endTime.setText(getDisplayTime(arrayList.get(position).getEndTime()));
@@ -53,9 +55,18 @@ public class EventsListAdapter extends BaseAdapter {
     }
 
     String getDisplayTime(long millis){
+//        SimpleDateFormat formatter = new SimpleDateFormat( "dd/MM/yyyy hh:mm:ss.SSS");
+//
+//        // Create a calendar object that will convert the date and time value in milliseconds to date.
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.setTimeInMillis(millis);
+
+        Log.d("uri", "In event display "+ String.valueOf(millis));
         int minutes = (int) ((millis / (1000*60)) % 60);
+        minutes = (minutes+30)%60;
         int hours   = (int) ((millis / (1000*60*60)) % 24);
         String amPm = "AM";
+        hours = (hours+6)%24;
         if(hours>12){
             hours -= 12;
             amPm = "PM";
