@@ -44,6 +44,25 @@ public class EventsListAdapter extends BaseAdapter {
 
         eventTitle.setText(arrayList.get(position).getTitle());
         participants.setText(arrayList.get(position).getParticipants());
+        Log.d("uri", arrayList.get(position).getDate());
+        date.setText(arrayList.get(position).getDate());
+        startTime.setText(getDisplayTime(arrayList.get(position).getStartTime()));
+        endTime.setText(getDisplayTime(arrayList.get(position).getEndTime()));
+
         return convertView;
+    }
+
+    String getDisplayTime(long millis){
+        int minutes = (int) ((millis / (1000*60)) % 60);
+        int hours   = (int) ((millis / (1000*60*60)) % 24);
+        String amPm = "AM";
+        if(hours>12){
+            hours -= 12;
+            amPm = "PM";
+        } else if(hours == 12){
+            amPm = "PM";
+        }
+
+        return String.valueOf(hours) + ":" + String.valueOf(minutes) + " " + amPm;
     }
 }

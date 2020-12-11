@@ -54,6 +54,7 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
         Cursor cursor;
         EventDescDialog dialogFragment;
         private String purpose = null;
+        private ArrayList<String> participantsList;
         private static final int REQUEST_CODE_SPEECH_INPUT=100;
 
         @Override
@@ -69,6 +70,8 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
             editText = root.findViewById(R.id.text);
             micButton = root.findViewById(R.id.voice_button);
             showEvents = root.findViewById(R.id.show_events);
+
+            participantsList = new ArrayList<>();
 
             textToSpeech = new TextToSpeech(getContext().getApplicationContext(), new TextToSpeech.OnInitListener() {
                 @Override
@@ -151,17 +154,25 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
                                 if(result.toLowerCase().contains("yes") || result.toLowerCase().contains("yeah")){
                                     initiateConversation("Please speak the participant name", "getParticipants", 3000);
                                 } else {
+                                    if(participantsList.size() == 0){
+                                        dialogFragment.participants.setText("No Participants");
+                                    }
+
                                     speak("Okay, Finished.");
                                     addToDatabase();
 
-
+                                    Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag("dialog box");
+                                    if (prev != null) {
+                                        DialogFragment df = (DialogFragment) prev;
+                                        df.dismiss();
+                                    }
                                 }
 
                                 break;
                             }
                             case "getParticipants":{
-                                String previousParticipants = dialogFragment.participants.getText().toString();
-                                dialogFragment.participants.setText(((previousParticipants.length() == 0)?previousParticipants:(previousParticipants + ", ")) + result);
+                                participantsList.add(result);
+                                dialogFragment.participants.setText(TextUtils.join(", ", participantsList));
                                 initiateConversation("Do you want to add more participants ?", "askForParticipants", 3000);
 
                                 break;
@@ -171,6 +182,55 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
                     break;
                 }
             }
+        }
+
+        long extractTimeInMillis(String time, String date){
+            int extractedDate=0 ,extractedHour=0 , extractedMinutes=0;
+
+            for(int i=0;i<date.length();i++){
+                if(  date.charAt(i)-'0'>=1 && date.charAt(i)-'0'<=9 ){
+                    extractedDate=(date.charAt(i)-'0');
+                    if(date.charAt(i+1)-'0'>=0 && date.charAt(i+1)-'0'<=9){
+                        extractedDate=10*(extractedDate)+(date.charAt(i+1)-'0');
+                    }
+                    break;
+                }
+            }
+            //extract hours from user given starTime
+            if(time.charAt(0)-'0'>=0 && time.charAt(0)-'0'<=9){
+                extractedHour=time.charAt(0)-'0';
+                if(time.charAt(1)-'0'>=0 && time.charAt(1)-'0'<=9) {
+                    extractedHour = extractedHour*10+(time.charAt(1) - '0');
+                }
+            }
+            for(int i=0;i<time.length();i++){
+                if(time.charAt(i)=='p') {
+                    extractedHour += 12;
+                    extractedHour = extractedHour%24;
+                    break;
+                }
+            }
+            //extract minutes from user given starTime
+            int startOfMinuteIndex=2;
+            if(time.charAt(2)-'0'<0 || time.charAt(2)-'0'>9)
+                startOfMinuteIndex++;
+            if(time.charAt(startOfMinuteIndex)-'0'>=0 && time.charAt(startOfMinuteIndex)-'0'<=9){
+                extractedMinutes=time.charAt(startOfMinuteIndex)-'0';
+                if(time.charAt(startOfMinuteIndex+1)-'0'>=0 && time.charAt(startOfMinuteIndex+1)-'0'<=9) {
+                    extractedMinutes = extractedMinutes*10+(time.charAt(startOfMinuteIndex+1) - '0');
+                }
+            }
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    extractedDate,
+                    extractedHour,
+                    extractedMinutes,
+                    0);
+
+            return calendar.getTimeInMillis();
         }
 
         private void addToDatabase() {
@@ -187,54 +247,11 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
              eventID=eventID.replaceAll("\\.", "");
              eventID=eventID.replaceAll(":", "");
 
-             int extractedDate=0 ,extractedHour=0 , extractedMinutes=0;
-
-             for(int i=0;i<date.length();i++){
-                 if(  date.charAt(i)-'0'>=1 && date.charAt(i)-'0'<=9 ){
-                     extractedDate=(date.charAt(i)-'0');
-                     if(date.charAt(i+1)-'0'>=0 && date.charAt(i+1)-'0'<=9){
-                         extractedDate=10*(extractedDate)+(date.charAt(i+1)-'0');
-                     }
-                     break;
-                 }
-             }
-            //extract hours from user given starTime
-            if(startTime.charAt(0)-'0'>=0 && startTime.charAt(0)-'0'<=9){
-                extractedHour=startTime.charAt(0)-'0';
-                if(startTime.charAt(1)-'0'>=0 && startTime.charAt(1)-'0'<=9) {
-                    extractedHour = extractedHour*10+(startTime.charAt(1) - '0');
-                }
-            }
-            for(int i=0;i<startTime.length();i++){
-                if(startTime.charAt(i)=='p') {
-                    extractedHour += 12;
-                    break;
-                }
-            }
-            //extract minutes from user given starTime
-            int startOfMinuteIndex=2;
-            if(startTime.charAt(2)-'0'<0 || startTime.charAt(2)-'0'>9)
-                startOfMinuteIndex++;
-            if(startTime.charAt(startOfMinuteIndex)-'0'>=0 && startTime.charAt(startOfMinuteIndex)-'0'<=9){
-                extractedMinutes=startTime.charAt(startOfMinuteIndex)-'0';
-                if(startTime.charAt(startOfMinuteIndex+1)-'0'>=0 && startTime.charAt(startOfMinuteIndex+1)-'0'<=9) {
-                    extractedMinutes = extractedMinutes*10+(startTime.charAt(startOfMinuteIndex+1) - '0');
-                }
-            }
-
-            Calendar calendar = Calendar.getInstance();
-            calendar.set(
-                    calendar.get(Calendar.YEAR),
-                    calendar.get(Calendar.MONTH),
-                    extractedDate,
-                    extractedHour,
-                    extractedMinutes,
-                    0);
 
             try {
 
-                long sTime=calendar.getTimeInMillis();
-                long eTime=calendar.getTimeInMillis();
+                long sTime=extractTimeInMillis(startTime, date);
+                long eTime=extractTimeInMillis(endTime, date);
                 Log.d("uri", "sTime: "+sTime);
 
                 event = new CustomModel(eventID , title , date , participants , sTime ,  eTime);
