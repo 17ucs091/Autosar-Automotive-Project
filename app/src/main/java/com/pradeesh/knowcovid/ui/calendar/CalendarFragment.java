@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,9 +49,9 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
         public static final Integer RecordAudioRequestCode = 1;
         private SpeechRecognizer speechRecognizer;
         private TextToSpeech textToSpeech;
-        private TextView editText;
-        private Button micButton,showEvents;
+        private ImageButton micButton,showEvents;
 
+        View root;
         Cursor cursor;
         EventDescDialog dialogFragment;
         private String purpose = null;
@@ -61,16 +62,13 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
         public View onCreateView(@NonNull LayoutInflater inflater,
                                  ViewGroup container, Bundle savedInstanceState) {
 
-            View root = inflater.inflate(R.layout.fragment_cal, container, false);
+            root = inflater.inflate(R.layout.fragment_cal, container, false);
             setUI(root);
 
             if (ContextCompat.checkSelfPermission(root.getContext(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
                 checkPermission();
             }
-            editText = root.findViewById(R.id.text);
             micButton = root.findViewById(R.id.voice_button);
-            showEvents = root.findViewById(R.id.show_events);
-
             participantsList = new ArrayList<>();
 
             textToSpeech = new TextToSpeech(getContext().getApplicationContext(), new TextToSpeech.OnInitListener() {
@@ -83,12 +81,12 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
                 }
             });
 
-            showEvents.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Navigation.findNavController(root).navigate(R.id.navigation_showEventsFragment);
-                }
-            });
+//            showEvents.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    Navigation.findNavController(root).navigate(R.id.navigation_showEventsFragment);
+//                }
+//            });
 
             micButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -320,13 +318,19 @@ import static com.pradeesh.knowcovid.utils.Constant.MAPURL;
 //            hotwords.put("read", "Reading today's events");
 
             hotwords.put("schedule", () -> {
-                editText.setText(command);
-
                 //Calling Event title Fragment
                 dialogFragment=new EventDescDialog();
                 dialogFragment.show(getActivity().getSupportFragmentManager(),"dialog box");
 
                 initiateConversation("Please give a title for the event","getTitle", 3000);
+            });
+
+            hotwords.put("show", () -> {
+                Navigation.findNavController(root).navigate(R.id.navigation_showEventsFragment);
+            });
+
+            hotwords.put("read", () -> {
+                Navigation.findNavController(root).navigate(R.id.navigation_showEventsFragment);
             });
 
             for(String hotword: hotwords.keySet()){
